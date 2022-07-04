@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/lib/pq"
 	"go-social-network.com/v1/web"
 )
 
@@ -19,18 +21,30 @@ func main() {
 func run() error {
 
 	var (
-		addr string
-		// sqlAddr    string
+		addr        string
+		sqlAddr     string
+		sqlPassword string
 		// sessionKey string
 	)
 
 	fs := flag.NewFlagSet("flag", flag.ExitOnError)
 	// fs.StringVar(&sessionKey, "session-key")
-	// fs.StringVar(&sqlAddr, "sqlAddr")
+	fs.StringVar(&sqlAddr, "sqlAddr", "", "postgres address database")
+	fs.StringVar(&sqlPassword, "sqlPass", "", "sql password")
 	fs.StringVar(&addr, "addr", ":4000", "Https server address")
 
-	if err := fs.Parse(os.Args[1:]); err != nil {
+	var err error
+
+	if err = fs.Parse(os.Args[1:]); err != nil {
 		return fmt.Errorf("error parsing: %w", err)
+	}
+
+	dsn := fmt.Sprintf("postgresql://go-user:%s@%s", sqlPassword, sqlAddr)
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatal("failed to connect database", err)
+	}
+	if db != nil {
 	}
 
 	logger := log.New(os.Stderr, "", log.Lshortfile|log.Ldate|log.Ltime)
@@ -49,7 +63,7 @@ func run() error {
 	defer srv.Close()
 
 	fmt.Printf("Server listening on %s\n", srv.Addr)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("listen and serve: %w", err)
 	}

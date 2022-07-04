@@ -23,3 +23,7 @@ go mod vendor - makes vendored copy of dependecies
 go mod graph - prints module requirement graph
 go mod verify - verifies dependencies have expected content
 go mod why - explains why packages or modules are needed
+
+
+https://dev.to/techschoolguru/generate-crud-golang-code-from-sql-and-compare-db-sql-gorm-sqlx-sqlc-560j
+https://docs.sqlc.dev/en/latest/overview/install.html
