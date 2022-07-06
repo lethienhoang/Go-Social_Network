@@ -1,12 +1,15 @@
 package web
 
 import (
+	"encoding/gob"
 	"log"
 	"net/http"
 	"sync"
 
+	"github.com/golangcollege/sessions"
 	"github.com/gorilla/mux"
 
+	"go-social-network.com/v1/internal/db"
 	service "go-social-network.com/v1/internal/services"
 )
 
@@ -18,6 +21,10 @@ type Handler struct {
 	handler http.Handler
 
 	Service *service.Service
+
+	Session *sessions.Session
+
+	SessionKey []byte
 }
 
 func (h *Handler) init() {
@@ -26,7 +33,11 @@ func (h *Handler) init() {
 	r.HandleFunc("/login", h.showLoginPageHandler).Methods("GET")
 	r.HandleFunc("/login", h.loginFormHandler).Methods("POST")
 
+	gob.Register(db.Users{})
+
+	h.Session = sessions.New(h.SessionKey)
 	h.handler = r
+	h.handler = h.Session.Enable(h.handler)
 }
 
 func (h *Handler) ServeHTTP() http.Handler {

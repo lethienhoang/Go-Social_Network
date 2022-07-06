@@ -26,4 +26,9 @@ go mod why - explains why packages or modules are needed
 
 
 https://dev.to/techschoolguru/generate-crud-golang-code-from-sql-and-compare-db-sql-gorm-sqlx-sqlc-560j
+https://dev.to/techschoolguru/how-to-write-run-database-migration-in-golang-5h6g
 https://docs.sqlc.dev/en/latest/overview/install.html
+
+migrate create -ext sql -dir db/migration -seq init_schema -> create new migration files
+
+sqlc generate

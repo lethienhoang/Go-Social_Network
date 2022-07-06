@@ -32,7 +32,15 @@ func (h *Handler) loginFormHandler(w http.ResponseWriter, r *http.Request) {
 		Email:    r.PostFormValue("email"),
 		Username: formPtr(r.PostForm, "username"),
 	}
-	h.Service.Login(ctx, &input)
+	user, err := h.Service.Login(ctx, &input)
+	if err != nil {
+		h.Logger.Printf("could not login: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	h.Session.Put(r, "user", user)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func formPtr(form url.Values, key string) *string {

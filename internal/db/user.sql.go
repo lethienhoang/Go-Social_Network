@@ -29,22 +29,60 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (time.Ti
 	return created_at, err
 }
 
-const userExistsByEmail = `-- name: userExistsByEmail :one
+const userByEmail = `-- name: UserByEmail :one
+SELECT 
+    id, email, username, created_at, updated_at
+FROM users WHERE email = LOWER($1)
+`
+
+func (q *Queries) UserByEmail(ctx context.Context, email string) (Users, error) {
+	row := q.db.QueryRowContext(ctx, userByEmail, email)
+	var i Users
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const userByUsername = `-- name: UserByUsername :one
+SELECT 
+    id, email, username, created_at, updated_at
+FROM users WHERE username = LOWER($1)
+`
+
+func (q *Queries) UserByUsername(ctx context.Context, username string) (Users, error) {
+	row := q.db.QueryRowContext(ctx, userByUsername, username)
+	var i Users
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Username,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const userExistsByEmail = `-- name: UserExistsByEmail :one
 SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)
 `
 
-func (q *Queries) userExistsByEmail(ctx context.Context, email string) (bool, error) {
+func (q *Queries) UserExistsByEmail(ctx context.Context, email string) (bool, error) {
 	row := q.db.QueryRowContext(ctx, userExistsByEmail, email)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
 }
 
-const userExistsByUsername = `-- name: userExistsByUsername :one
+const userExistsByUsername = `-- name: UserExistsByUsername :one
 SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE $1)
 `
 
-func (q *Queries) userExistsByUsername(ctx context.Context, username string) (bool, error) {
+func (q *Queries) UserExistsByUsername(ctx context.Context, username string) (bool, error) {
 	row := q.db.QueryRowContext(ctx, userExistsByUsername, username)
 	var exists bool
 	err := row.Scan(&exists)

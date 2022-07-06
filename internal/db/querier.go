@@ -17,8 +17,10 @@ type Querier interface {
 	GetAccountForUpdate(ctx context.Context, id int64) (Accounts, error)
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Accounts, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Accounts, error)
-	userExistsByEmail(ctx context.Context, email string) (bool, error)
-	userExistsByUsername(ctx context.Context, username string) (bool, error)
+	UserByEmail(ctx context.Context, email string) (Users, error)
+	UserByUsername(ctx context.Context, username string) (Users, error)
+	UserExistsByEmail(ctx context.Context, email string) (bool, error)
+	UserExistsByUsername(ctx context.Context, username string) (bool, error)
 }
 
 var _ Querier = (*Queries)(nil)

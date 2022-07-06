@@ -11,6 +11,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"go-social-network.com/v1/internal/db"
+	service "go-social-network.com/v1/internal/services"
 	"go-social-network.com/v1/web"
 )
 
@@ -40,17 +42,21 @@ func run() error {
 	}
 
 	dsn := fmt.Sprintf("postgresql://go-user:%s@%s", sqlPassword, sqlAddr)
-	db, err := sql.Open("postgres", dsn)
+	dbConn, err := sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatal("failed to connect database", err)
 	}
-	if db != nil {
+
+	queries := db.New(dbConn)
+	svc := &service.Service{
+		Queries: queries,
 	}
 
 	logger := log.New(os.Stderr, "", log.Lshortfile|log.Ldate|log.Ltime)
 
 	webHanlder := &web.Handler{
-		Logger: logger,
+		Logger:  logger,
+		Service: svc,
 	}
 
 	srv := &http.Server{
