@@ -32,3 +32,6 @@ https://docs.sqlc.dev/en/latest/overview/install.html
 migrate create -ext sql -dir db/migration -seq init_schema -> create new migration files
 
 sqlc generate
+
+https://www.cockroachlabs.com/docs/v22.1/secure-a-cluster
+https://www.cockroachlabs.com/docs/stable/connect-to-the-database.html?filters=prisma&filters=go&filters=dedicated
