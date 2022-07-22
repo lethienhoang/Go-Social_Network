@@ -11,9 +11,9 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users(
+INSERT INTO "user" (
     id, email, username
-) VALUES ($1, $2, $3) RETURNING created_at
+) VALUES ($1, LOWER($2), $3) RETURNING created_at
 `
 
 type CreateUserParams struct {
@@ -30,18 +30,19 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (time.Ti
 }
 
 const userByEmail = `-- name: UserByEmail :one
-SELECT 
-    id, email, username, created_at, updated_at
-FROM users WHERE email = LOWER($1)
+SELECT id, email, username, posts_count, followers_count, following_count, created_at, updated_at FROM "user" WHERE email = $1
 `
 
-func (q *Queries) UserByEmail(ctx context.Context, email string) (Users, error) {
+func (q *Queries) UserByEmail(ctx context.Context, email string) (User, error) {
 	row := q.db.QueryRowContext(ctx, userByEmail, email)
-	var i Users
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Username,
+		&i.PostsCount,
+		&i.FollowersCount,
+		&i.FollowingCount,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -49,18 +50,19 @@ func (q *Queries) UserByEmail(ctx context.Context, email string) (Users, error) 
 }
 
 const userByUsername = `-- name: UserByUsername :one
-SELECT 
-    id, email, username, created_at, updated_at
-FROM users WHERE username = LOWER($1)
+SELECT id, email, username, posts_count, followers_count, following_count, created_at, updated_at FROM "user" WHERE username = $1
 `
 
-func (q *Queries) UserByUsername(ctx context.Context, username string) (Users, error) {
+func (q *Queries) UserByUsername(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRowContext(ctx, userByUsername, username)
-	var i Users
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Username,
+		&i.PostsCount,
+		&i.FollowersCount,
+		&i.FollowingCount,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -68,7 +70,7 @@ func (q *Queries) UserByUsername(ctx context.Context, username string) (Users, e
 }
 
 const userExistsByEmail = `-- name: UserExistsByEmail :one
-SELECT EXISTS (SELECT 1 FROM users WHERE email = $1)
+SELECT EXISTS (SELECT 1 FROM "user" WHERE LOWER(email) = LOWER($1))
 `
 
 func (q *Queries) UserExistsByEmail(ctx context.Context, email string) (bool, error) {
@@ -79,7 +81,7 @@ func (q *Queries) UserExistsByEmail(ctx context.Context, email string) (bool, er
 }
 
 const userExistsByUsername = `-- name: UserExistsByUsername :one
-SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE $1)
+SELECT EXISTS (SELECT 1 FROM "user" WHERE LOWER(username) = LOWER($1))
 `
 
 func (q *Queries) UserExistsByUsername(ctx context.Context, username string) (bool, error) {

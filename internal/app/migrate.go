@@ -2,9 +2,7 @@ package app
 
 import (
 	"errors"
-	"flag"
 	"log"
-	"os"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -18,16 +16,7 @@ const (
 	_defaultTimeout  = time.Second
 )
 
-func RunMigrate() {
-	var (
-		dbURL  string
-		action string
-	)
-
-	fs := flag.NewFlagSet("flag", flag.ExitOnError)
-	fs.StringVar(&dbURL, "dbURL", "", "database address connection string")
-	fs.StringVar(&action, "action", "", "action to execute")
-
+func Execute(dbURL string, migrateAction string) {
 	// dbURL += "?sslmode=disable"
 
 	var (
@@ -35,10 +24,6 @@ func RunMigrate() {
 		err      error
 		m        *migrate.Migrate
 	)
-
-	if err = fs.Parse(os.Args[1:]); err != nil {
-		log.Printf("parsing failed: %v", err)
-	}
 
 	for attempts > 0 {
 		m, err = migrate.New("file://internal/sqlc/migrations", dbURL)
@@ -55,16 +40,16 @@ func RunMigrate() {
 		return
 	}
 
-	if action == "up" {
+	if migrateAction == "up" {
 		err = m.Up()
-	} else if action == "down" {
+	} else if migrateAction == "down" {
 		err = m.Down()
 	}
 
 	defer m.Close()
 
 	if err != nil {
-		log.Printf("migration failed: %v -> %v", action, err)
+		log.Printf("migration failed: %v -> %v", migrateAction, err)
 		return
 	}
 
@@ -73,5 +58,5 @@ func RunMigrate() {
 		return
 	}
 
-	log.Printf("Migrate: %v succeeded", action)
+	log.Printf("Migrate: %v succeeded", migrateAction)
 }

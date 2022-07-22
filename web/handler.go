@@ -31,9 +31,11 @@ func (h *Handler) init() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/login", h.showLoginPageHandler).Methods("GET")
-	r.HandleFunc("/login", h.loginFormHandler).Methods("POST")
+	r.HandleFunc("/", h.showHomePageHandler).Methods("GET")
+	r.HandleFunc("/login", h.login).Methods("POST")
+	r.HandleFunc("/logout", h.logout).Methods("POST")
 
-	gob.Register(db.Users{})
+	gob.Register(db.User{})
 
 	h.Session = sessions.New(h.SessionKey)
 	h.handler = r

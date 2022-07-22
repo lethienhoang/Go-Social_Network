@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,22 +16,9 @@ import (
 	"go-social-network.com/v1/web"
 )
 
-func Run() {
-	var (
-		dbURL   string
-		address string
-	)
-
-	fs := flag.NewFlagSet("flag", flag.ExitOnError)
-	// fs.StringVar(&sessionKey, "session-key")
-	fs.StringVar(&dbURL, "dbURL", "", "postgres address database")
-	fs.StringVar(&address, "address", ":4000", "Https server address")
+func Run(dbURL string, address string) {
 
 	logger := log.New(os.Stderr, "", log.Lshortfile|log.Ldate|log.Ltime)
-
-	if err := fs.Parse(os.Args[1:]); err != nil {
-		log.Printf("parsing failed: %v", err)
-	}
 
 	databaseConn, err := postgres.New(dbURL)
 	if err != nil {

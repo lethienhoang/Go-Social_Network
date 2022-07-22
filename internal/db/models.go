@@ -8,18 +8,38 @@ import (
 	"time"
 )
 
-type Accounts struct {
-	ID        int64     `json:"id"`
-	Owner     string    `json:"owner"`
-	Balance   int64     `json:"balance"`
-	Currency  string    `json:"currency"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type Users struct {
+type Comment struct {
 	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	Username  string    `json:"username"`
+	UserID    string    `json:"user_id"`
+	PostID    string    `json:"post_id"`
+	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type Post struct {
+	ID            string    `json:"id"`
+	UserID        string    `json:"user_id"`
+	Content       string    `json:"content"`
+	CommentsCount int32     `json:"comments_count"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type User struct {
+	ID             string    `json:"id"`
+	Email          string    `json:"email"`
+	Username       string    `json:"username"`
+	PostsCount     int32     `json:"posts_count"`
+	FollowersCount int32     `json:"followers_count"`
+	FollowingCount int32     `json:"following_count"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}
+
+type UserFollow struct {
+	FollowerID string    `json:"follower_id"`
+	FollowedID string    `json:"followed_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }

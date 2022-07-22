@@ -1,20 +1,16 @@
 -- name: CreateUser :one
-INSERT INTO users(
+INSERT INTO "user" (
     id, email, username
-) VALUES (@ID, @email, @username) RETURNING created_at;
+) VALUES (@ID, LOWER(@email), @username) RETURNING created_at;
 
 -- name: UserByEmail :one
-SELECT 
-    *
-FROM users WHERE email = LOWER(@email);
+SELECT * FROM "user" WHERE email = @email;
 
 -- name: UserByUsername :one
-SELECT 
-    *
-FROM users WHERE username = LOWER(@username);
+SELECT * FROM "user" WHERE username = @username;
 
 -- name: UserExistsByEmail :one
-SELECT EXISTS (SELECT 1 FROM users WHERE email = @email);
+SELECT EXISTS (SELECT 1 FROM "user" WHERE LOWER(email) = LOWER(@email));
 
 -- name: UserExistsByUsername :one
-SELECT EXISTS (SELECT 1 FROM users WHERE username LIKE @username);
+SELECT EXISTS (SELECT 1 FROM "user" WHERE LOWER(username) = LOWER(@username));

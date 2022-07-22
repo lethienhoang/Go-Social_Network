@@ -21,9 +21,15 @@ func (h *Handler) showLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	h.renderLogin(w, loginForm{}, http.StatusOK)
 }
 
-func (h *Handler) loginFormHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if r.PostFormValue("email") == "" {
+		h.Logger.Printf("could not login: %v\n", "Email is missing")
+		http.Error(w, "Email is missing", http.StatusBadRequest)
 		return
 	}
 
@@ -40,6 +46,11 @@ func (h *Handler) loginFormHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.Session.Put(r, "user", user)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func (h *Handler) logout(w http.ResponseWriter, r *http.Request) {
+	h.Session.Remove(r, "user")
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 

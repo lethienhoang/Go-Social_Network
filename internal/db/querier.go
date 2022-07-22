@@ -10,15 +10,9 @@ import (
 )
 
 type Querier interface {
-	AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Accounts, error)
-	CreateAccount(ctx context.Context, arg CreateAccountParams) (Accounts, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (time.Time, error)
-	GetAccount(ctx context.Context, id int64) (Accounts, error)
-	GetAccountForUpdate(ctx context.Context, id int64) (Accounts, error)
-	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Accounts, error)
-	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Accounts, error)
-	UserByEmail(ctx context.Context, email string) (Users, error)
-	UserByUsername(ctx context.Context, username string) (Users, error)
+	UserByEmail(ctx context.Context, email string) (User, error)
+	UserByUsername(ctx context.Context, username string) (User, error)
 	UserExistsByEmail(ctx context.Context, email string) (bool, error)
 	UserExistsByUsername(ctx context.Context, username string) (bool, error)
 }
