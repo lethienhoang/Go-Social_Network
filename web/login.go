@@ -41,7 +41,7 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 	user, err := h.Service.Login(ctx, &input)
 	if err != nil {
 		h.Logger.Printf("could not login: %v\n", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.renderLogin(w, loginForm{Form: r.PostForm, Err: err}, http.StatusBadRequest)
 		return
 	}
 

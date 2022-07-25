@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/google/uuid"
 
+	"go-social-network.com/v1/internal/contains"
 	"go-social-network.com/v1/internal/db"
 )
 
@@ -37,7 +39,7 @@ func (s *Service) Login(ctx context.Context, req *LoginInput) (*db.User, error) 
 	}
 
 	if req.Username == nil {
-		return &out, nil
+		return &out, errors.New(contains.ErrUserNameMissing)
 	}
 
 	exists, err = s.Queries.UserExistsByUsername(ctx, *req.Username)
@@ -51,26 +53,27 @@ func (s *Service) Login(ctx context.Context, req *LoginInput) (*db.User, error) 
 			return &out, err
 		}
 
-		return &userByUsername, nil
-	} else {
-		newID, _ := uuid.NewUUID()
-		userParams := db.CreateUserParams{
-			ID:       newID.String(),
-			Email:    req.Email,
-			Username: *req.Username,
-		}
-		createAt, err := s.Queries.CreateUser(ctx, userParams)
-		if err != nil {
-			return &out, err
-		}
-
-		out = db.User{
-			ID:        userParams.ID,
-			Email:     req.Email,
-			Username:  *req.Username,
-			CreatedAt: createAt,
-			UpdatedAt: createAt,
-		}
+		return &userByUsername, errors.New(contains.ErrUserAlreadyExists)
 	}
+
+	newID, _ := uuid.NewUUID()
+	userParams := db.CreateUserParams{
+		ID:       newID.String(),
+		Email:    req.Email,
+		Username: *req.Username,
+	}
+	createAt, err := s.Queries.CreateUser(ctx, userParams)
+	if err != nil {
+		return &out, err
+	}
+
+	out = db.User{
+		ID:        userParams.ID,
+		Email:     req.Email,
+		Username:  *req.Username,
+		CreatedAt: createAt,
+		UpdatedAt: createAt,
+	}
+
 	return &out, nil
 }
